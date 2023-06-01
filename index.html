@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<meta charset="UTF-8">
   <title>テキストファイルを画像に変換</title>
 </head>
 <body>
@@ -32,7 +30,6 @@
         const imagePromises = lines.map((line, index) => {
           return new Promise(resolve => {
             const image = new Image();
-            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAfUlEQVR4Ae3PQQrAQBADwW86DdF8H18sJXmI7CQE7Avb8GseKs6YR0gb+TM8nR8My3PCvCf8B+LAMeFgG8gDr8x/QcLwCOxEd7ewBuQ/Jf2vFWC2UQL8wmy3ug1ysk8MxunQW0Rvyc/6bjTqM9yK/EGn+IGE3xLxtgzRvoF1jZ2kAAAAsUSrGY6s4HjUAAAAAElFTkSuQmCC';
             image.onload = function() {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
               ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -41,6 +38,7 @@
                 resolve();
               }, 'image/png');
             };
+            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAfUlEQVR4Ae3PQQrAQBADwW86DdF8H18sJXmI7CQE7Avb8GseKs6YR0gb+TM8nR8My3PCvCf8B+LAMeFgG8gDr8x/QcLwCOxEd7ewBuQ/Jf2vFWC2UQL8wmy3ug1ysk8MxunQW0Rvyc/6bjTqM9yK/EGn+IGE3xLxtgzRvoF1jZ2kAAAAsUSrGY6s4HjUAAAAAElFTkSuQmCC';
           });
         });
 
