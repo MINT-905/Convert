@@ -9,6 +9,7 @@
   <a id="downloadLink" style="display: none;" download="images.zip">ZIPダウンロード</a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
   <script>
     function convertToImages() {
       const fileInput = document.getElementById('txtFileInput');
@@ -19,26 +20,20 @@
         const content = e.target.result;
         const lines = content.split('\n');
 
-        // 画像を保存するためのキャンバスを作成
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 100;
-        canvas.height = 100;
-
-        // 画像を生成してZIPに追加
         const zip = new JSZip();
         const imagePromises = lines.map((line, index) => {
           return new Promise(resolve => {
-            const image = new Image();
-            image.onload = function() {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-              canvas.toBlob(function(blob) {
-                zip.file(`image${index}.png`, blob);
-                resolve();
-              }, 'image/png');
-            };
-            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAfUlEQVR4Ae3PQQrAQBADwW86DdF8H18sJXmI7CQE7Avb8GseKs6YR0gb+TM8nR8My3PCvCf8B+LAMeFgG8gDr8x/QcLwCOxEd7ewBuQ/Jf2vFWC2UQL8wmy3ug1ysk8MxunQW0Rvyc/6bjTqM9yK/EGn+IGE3xLxtgzRvoF1jZ2kAAAAsUSrGY6s4HjUAAAAAElFTkSuQmCC';
+            const textElement = document.createElement('div');
+            textElement.textContent = line;
+            document.body.appendChild(textElement);
+
+            html2canvas(textElement).then(canvas => {
+              const imageDataURL = canvas.toDataURL('image/png');
+              zip.file(`image${index}.png`, imageDataURL.substr(imageDataURL.indexOf(',') + 1), { base64: true });
+
+              document.body.removeChild(textElement);
+              resolve();
+            });
           });
         });
 
