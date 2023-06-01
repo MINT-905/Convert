@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+  <title>テキストファイルを画像に変換</title>
+</head>
+<body>
+  <input type="file" id="txtFileInput" accept=".txt">
+  <button onclick="convertToImages()">変換</button>
+  <a id="downloadLink" style="display: none;" download="images.zip">ZIPダウンロード</a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+  <script>
+    function convertToImages() {
+      const fileInput = document.getElementById('txtFileInput');
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const content = e.target.result;
+        const lines = content.split('\n');
+
+        // 画像を保存するためのキャンバスを作成
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 100;
+        canvas.height = 100;
+
+        // 画像を生成してZIPに追加
+        const zip = new JSZip();
+        const imagePromises = lines.map((line, index) => {
+          return new Promise(resolve => {
+            const image = new Image();
+            image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAfUlEQVR4Ae3PQQrAQBADwW86DdF8H18sJXmI7CQE7Avb8GseKs6YR0gb+TM8nR8My3PCvCf8B+LAMeFgG8gDr8x/QcLwCOxEd7ewBuQ/Jf2vFWC2UQL8wmy3ug1ysk8MxunQW0Rvyc/6bjTqM9yK/EGn+IGE3xLxtgzRvoF1jZ2kAAAAsUSrGY6s4HjUAAAAAElFTkSuQmCC';
+            image.onload = function() {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob(function(blob) {
+                zip.file(`image${index}.png`, blob);
+                resolve();
+              }, 'image/png');
+            };
+          });
+        });
+
+        Promise.all(imagePromises).then(() => {
+          zip.generateAsync({ type: 'blob' }).then(function (content) {
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.href = URL.createObjectURL(content);
+            downloadLink.style.display = 'block';
+          });
+        });
+      };
+
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
