@@ -2,10 +2,10 @@ from PIL import Image, ImageDraw, ImageFont
 from zipfile import ZipFile
 import os
 
-uploaded_file = os.environ['TMPDIR'] + '/' + os.environ['HTTP_FILENAME']
+uploaded_file = os.path.join(os.environ['TMPDIR'], os.environ['HTTP_FILENAME'])
 
-with open(uploaded_file, 'rb') as f:
-    lines = f.read().decode('utf-8').splitlines()
+with open(uploaded_file, 'r') as f:
+    lines = f.read().splitlines()
 
 zip_filename = 'images.zip'
 zip_file = ZipFile(zip_filename, 'w')
@@ -21,8 +21,10 @@ for index, line in enumerate(lines):
 
 zip_file.close()
 
+with open(zip_filename, 'rb') as f:
+    zip_data = f.read()
+
 print('Content-Type: application/zip')
 print(f'Content-Disposition: attachment; filename="{zip_filename}"')
 print()
-with open(zip_filename, 'rb') as f:
-    print(f.read())
+print(zip_data)
